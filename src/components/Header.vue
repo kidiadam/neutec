@@ -2,26 +2,53 @@
   <header class="myHeader">
     <button @click="menuOpened = true">選單</button>
   </header>
-    <div v-show="menuOpened" class="mask" @click="menuOpened = false"></div>
-    <div class="menuList" :class="{ menuOpened }">
-      <MenuListItem :menu="menu" />
-    </div>
+  <div v-show="menuOpened" class="mask" @click="menuOpened = false"></div>
+  <div class="menuList" :class="{ menuOpened }">
+    <select v-model="selectedOption" @change="changeMenu">
+      <option value="" disabled>請選擇</option>
+      <option v-for="option in selectOptions" :key="option.key" :value="option.key">{{ option.text }}</option>
+    </select>
+    <MenuListItem :menu="menu" ref="menuListItem" />
+  </div>
 </template>
 
 <script setup>
 import MenuListItem from '@/components/MenuListItem.vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import data from '@/assets/menu.json'
 
-defineProps({
-  msg: String,
+const menuOpened = ref(false)
+const menuListItem = ref(null)
+const menu = data
+const selectOptions = ref([])
+const selectedOption = ref("")
+
+function flattenArray(arr) {
+  const savedKey = localStorage.getItem("selectedMenu")
+  arr.forEach(item => {
+    if (savedKey && savedKey === item.key) selectedOption.value = savedKey
+    selectOptions.value.push(item)
+    const { children } = item
+    if (children) flattenArray(children)
+  })
+}
+const changeMenu = function() {
+  const { value } = selectedOption
+  menuListItem.value.findMenuItem(value)
+  localStorage.setItem ("selectedMenu", value)
+}
+
+
+onMounted(() => {
+  const savedKey = localStorage.getItem("selectedMenu")
+  if (savedKey) {
+    menuListItem.value.openMenuItem(savedKey)
+    menuOpened.value = true
+  }
+  flattenArray(menu)
 })
 
-const menuOpened = ref(false)
-const menu = data
-
 </script>
-
 <style scoped lang="scss">
 .myHeader {
   position: sticky;
@@ -60,5 +87,15 @@ const menu = data
   &.menuOpened {
     width: 200px;
   }
+}
+select {
+  width: 95%;
+  height: 32px;
+  border: 1px solid #c0c4cc;
+  border-radius: .25rem;
+  appearance: none;
+  outline: none;
+  margin: 6px auto;
+  padding: 0 4px;
 }
 </style>
