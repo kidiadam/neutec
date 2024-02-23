@@ -1,7 +1,7 @@
 <template>
-  <Header />
+  <Header @changeAnimationType="changeAnimationType" />
   <main>
-    <Boxes /> 
+    <Boxes :type="animationType" />
   </main>
 </template>
 
@@ -11,11 +11,11 @@ import Boxes from '@/components/Boxes.vue'
 
 import { ref } from 'vue'
 
-defineProps({
-  msg: String,
-})
+const animationType = ref(1)
+const changeAnimationType = function(value) {
+  animationType.value = value
+}
 
-const count = ref(0)
 </script>
 
 <style scoped lang="scss">

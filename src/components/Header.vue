@@ -1,6 +1,8 @@
 <template>
   <header class="myHeader">
-    <button @click="menuOpened = true">選單</button>
+    <button @click="emit('changeAnimationType', 1)">預設動畫</button>
+    <button @click="emit('changeAnimationType', 2)">往同座標</button>
+    <button @click="menuOpened = true">menu</button>
   </header>
   <div v-show="menuOpened" class="mask" @click="menuOpened = false"></div>
   <div class="menuList" :class="{ menuOpened }">
@@ -22,6 +24,8 @@ const menuListItem = ref(null)
 const menu = data
 const selectOptions = ref([])
 const selectedOption = ref("")
+
+const emit = defineEmits(['changeAnimationType']);
 
 function flattenArray(arr) {
   const savedKey = localStorage.getItem("selectedMenu")
@@ -55,7 +59,7 @@ onMounted(() => {
   width: 100%;
   padding: 12px 16px;
   display: flex;
-  justify-content: end;
+  justify-content: space-between;
   background: white;
   top: 0;
 }
